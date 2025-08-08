@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Currency to EUR Converter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset & basics */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      animation: fadeIn 1s ease forwards;
+    }
+    h1 {
+      font-weight: 700;
+      margin-bottom: 30px;
+      letter-spacing: 1.5px;
+      text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+    }
+    label {
+      display: block;
+      text-align: left;
+      font-weight: 600;
+      margin-bottom: 6px;
+      margin-top: 18px;
+      font-size: 0.9rem;
+      text-shadow: 0 0 3px rgba(0,0,0,0.2);
+    }
+    input, select {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      text-shadow: 0 0 2px rgba(0,0,0,0.4);
+    }
+    input::placeholder {
+      color: #eee;
+      opacity: 0.8;
+    }
+    input:focus, select:focus {
+      box-shadow: 0 0 8px 2px #9f7aea;
+      background: rgba(255, 255, 255, 0.35);
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+    select {
+      cursor: pointer;
+    }
+    button {
+      margin-top: 28px;
+      width: 100%;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      background: #9f7aea;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 6px 15px rgba(159, 122, 234, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+    button:hover {
+      background: #7b5dc7;
+      box-shadow: 0 8px 20px rgba(123, 93, 199, 0.7);
+    }
+    #result {
+      margin-top: 28px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-height: 40px;
+      color: #dcdcdc;
+      text-shadow: 0 0 6px #b794f4;
+      transition: opacity 0.5s ease;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 0.85rem;
+      color: #cbb6f7cc;
+      font-style: italic;
+      user-select: none;
+      line-height: 1.4;
+    }
+    footer a {
+      color: #dcdcdc;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1.5px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+    footer a:hover {
+      border-color: #dcdcdc;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(15px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Currency converter form">
+    <h1>Currency to EUR Converter</h1>
+
+    <label for="amount">Amount</label>
+    <input type="number" id="amount" value="100" step="0.01" aria-describedby="amount-desc" />
+
+    <label for="currency">Currency</label>
+    <select id="currency" aria-label="Select currency">
+      <option value="GBP" data-flag="🇬🇧">🇬🇧 GBP - British Pound</option>
+      <option value="USD" data-flag="🇺🇸">🇺🇸 USD - US Dollar</option>
+      <option value="EUR" data-flag="🇪🇺">🇪🇺 EUR - Euro</option>
+      <option value="JPY" data-flag="🇯🇵">🇯🇵 JPY - Japanese Yen</option>
+      <option value="AUD" data-flag="🇦🇺">🇦🇺 AUD - Australian Dollar</option>
+    </select>
+
+    <label for="date">Date</label>
+    <input type="date" id="date" aria-describedby="date-desc" />
+
+    <button type="button" onclick="convertCurrency()">Convert</button>
+
+    <div id="result" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <footer>
+    Developed by <strong>Syam Sajeev</strong>, Founder —  
+    <a href="https://www.linkedin.com/in/syam-sajeev/" target="_blank" rel="noopener noreferrer">
+      LinkedIn
+    </a>
+    <br />
+    <small>Office: Apt 47, Block C, Smithfield Market, Dublin 7</small>
+  </footer>
+
+<script>
+  const currencySelect = document.getElementById('currency');
+  const amountInput = document.getElementById('amount');
+  const dateInput = document.getElementById('date');
+  const resultDiv = document.getElementById('result');
+
+  function updateSelectFlag() {
+    const selectedOption = currencySelect.options[currencySelect.selectedIndex];
+    currencySelect.title = selectedOption.getAttribute('data-flag') + " " + selectedOption.textContent;
+  }
+  currencySelect.addEventListener('change', updateSelectFlag);
+  updateSelectFlag();
+
+  async function convertCurrency() {
+    const amount = parseFloat(amountInput.value);
+    const currency = currencySelect.value;
+    const date = dateInput.value;
+
+    if (!amount || !currency || !date) {
+      resultDiv.textContent = "Please fill in all fields.";
+      return;
+    }
+
+    try {
+      const url = `https://api.frankfurter.app/${date}?from=${currency}&to=EUR`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        resultDiv.textContent = "Error fetching data.";
+        return;
+      }
+      const data = await res.json();
+
+      if (data.rates && data.rates.EUR !== undefined) {
+        const converted = amount * data.rates.EUR;
+        resultDiv.textContent =
+          `${amount} ${currency} = ${converted.toFixed(2)} EUR (Rate: ${data.rates.EUR} on ${data.date})`;
+      } else {
+        resultDiv.textContent = "No rate found for that date.";
+      }
+    } catch (err) {
+      resultDiv.textContent = "Error: " + err;
+    }
+  }
+</script>
+</body>
+</html>
